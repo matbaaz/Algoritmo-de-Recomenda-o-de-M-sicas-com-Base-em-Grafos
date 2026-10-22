@@ -1,0 +1,35 @@
+// Limpeza: remove os nós Genre que NAO sao gênero musical
+// e Músicas que não possuem gênero.
+// (decadas, pais/idioma, humor, instrumento/voz, formato).
+
+// O que será removido 
+MATCH (g:Genre)
+WHERE g.name IN ['00s','60s','70s','80s','90s',
+                 'american','british','french','german','japanese','polish','russian','swedish',
+                 'acoustic','beautiful','chill','chillout','love','mellow','oldies',
+                 'guitar','piano','instrumental','female_vocalists','male_vocalists',
+                 'cover','soundtrack','singer_songwriter']
+OPTIONAL MATCH (g)<-[r:HAS]-()
+RETURN g.name AS tag, count(r) AS musicas
+ORDER BY musicas DESC
+
+// Remoção
+MATCH (g:Genre)
+WHERE g.name IN ['00s','60s','70s','80s','90s',
+                 'american','british','french','german','japanese','polish','russian','swedish',
+                 'acoustic','beautiful','chill','chillout','love','mellow','oldies',
+                 'guitar','piano','instrumental','female_vocalists','male_vocalists',
+                 'cover','soundtrack','singer_songwriter']
+CALL (g) { DETACH DELETE g } IN TRANSACTIONS OF 5 ROWS
+
+// Depois de remover
+MATCH (g:Genre) RETURN count(g) AS generos
+MATCH ()-[r:HAS]->() RETURN count(r) AS has
+
+// Quantidade de músicas que ficaram sem nenhum gênero
+MATCH (m:Music) WHERE NOT (m)-[:HAS]->() RETURN count(m) AS musicas_sem_genero
+
+// Deletando as músicas sem gênero
+MATCH (m:Music) WHERE NOT (m)-[:HAS]->() DETACH DELETE m
+
+// As imagens relacionadas podem ser vistas no .md dentro da pasta de Imagens/limpeza.md
