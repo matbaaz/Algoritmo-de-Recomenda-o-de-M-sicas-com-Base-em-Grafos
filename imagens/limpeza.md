@@ -6,30 +6,40 @@ Esta parte é relacionada a popular o DB com a parte de músicas, gêneros, Arti
 
 ## Dados originais
 
-<img width="796" height="264" alt="Captura de tela 2026-10-22 002916" src="https://github.com/user-attachments/assets/8e92f98e-2d8b-4e3b-ba88-771b619f61e5" />
+<img width="781" height="324" alt="Captura de tela 2026-10-23 215759" src="https://github.com/user-attachments/assets/2f1fa621-941b-4805-8dc2-9d818177ac76" />
 
-<img width="791" height="238" alt="Captura de tela 2026-10-22 002923" src="https://github.com/user-attachments/assets/d90cc94a-0c49-4b16-95eb-485b4e828c99" />
+<img width="777" height="404" alt="image" src="https://github.com/user-attachments/assets/02456fb5-7e57-47a8-b24b-88c38d7304ff" />
 
-## Inserção do segundo label `Person` em Artistas.
+## Inserção do segundo label `Person` em Artistas e Usuários.
 
-<img width="547" height="85" alt="Captura de tela 2026-10-22 002926" src="https://github.com/user-attachments/assets/6a4c18d5-5f4d-4b9a-8681-dcd3c7083893" />
+<img width="509" height="165" alt="image" src="https://github.com/user-attachments/assets/1ac56675-f565-40bc-a219-2b5d9890dfc7" />
 
 ## Exemplo de listagem de Gêneros a serem deletados
 
-<img width="778" height="610" alt="Captura de tela 2026-10-22 002933" src="https://github.com/user-attachments/assets/5d93a15f-6f3d-4c6b-b231-1a18d0f678a1" />
+<img width="785" height="576" alt="image" src="https://github.com/user-attachments/assets/d072530f-803b-4495-a3aa-6852074704c7" />
 
 ## Deleção dos gêneros e relações
 
-<img width="585" height="105" alt="Captura de tela 2026-10-22 002938" src="https://github.com/user-attachments/assets/ef46945b-3a15-4835-a9bb-c4d60ac4212d" />
+<img width="783" height="103" alt="image" src="https://github.com/user-attachments/assets/d4691395-f7a0-4b7e-96fd-a4c590d23638" />
 
 ## Confirmação das deleções
 
-<img width="512" height="184" alt="Captura de tela 2026-10-22 002941" src="https://github.com/user-attachments/assets/f1b55e1d-7657-4963-bdf6-92a5bc8b28c9" />
+<img width="541" height="192" alt="image" src="https://github.com/user-attachments/assets/adfce643-bd0b-4333-a0ca-e4174530a5a4" />
 
-<img width="513" height="213" alt="Captura de tela 2026-10-22 002943" src="https://github.com/user-attachments/assets/a320eae6-22ac-4d78-89a9-843e76fd4d8f" />
+<img width="550" height="192" alt="image" src="https://github.com/user-attachments/assets/d8b0dadf-22e2-4a92-87d7-580248521f59" />
 
 ## Deleção de músicas sem gênero
 
-<img width="794" height="199" alt="Captura de tela 2026-10-22 002947" src="https://github.com/user-attachments/assets/11f0d678-9576-4b2d-9afa-26be2a7caea3" />
+<img width="782" height="167" alt="image" src="https://github.com/user-attachments/assets/62b02bdc-87c1-4ba2-b9aa-7db808cdcb21" />
 
-<img width="660" height="85" alt="Captura de tela 2026-10-22 002951" src="https://github.com/user-attachments/assets/9b36667f-4808-43bf-86a8-bc4908133282" />
+<img width="613" height="78" alt="image" src="https://github.com/user-attachments/assets/7346bb26-7eb9-4b46-baa8-12a898d64af5" />
+
+## Deleção de artistas sem música
+
+<img width="764" height="174" alt="image" src="https://github.com/user-attachments/assets/2d123a96-2d5f-42bd-ad0c-7d4b25a94d58" />
+
+<img width="709" height="80" alt="image" src="https://github.com/user-attachments/assets/8a024b05-f5e3-421c-8507-ff36a3d41aff" />
+
+## Gerando relação BELONG
+
+<img width="864" height="80" alt="image" src="https://github.com/user-attachments/assets/913def9c-8950-4677-9c6a-5c7c6688d7ef" />
