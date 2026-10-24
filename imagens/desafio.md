@@ -2,64 +2,28 @@
 
 ## Parâmetros
 
-Para responder ao desafio, podemos utilizar diferentes parâmetros, então decidimos determinar o ID de 1 usuário com 
-`MATCH (u:Usuário) RETURN u.id LIMIT 40`. Tendo a partir dessa query os ID, decido de forma aleatória o u0013 como base para as recomendações.
+Para o usuário `u0013`. As queries de geração dessas respostas se encontram no caminho scripts/desafio.txt.
 
-// Recomendação 1. Filtragem colaborativa: "quem ouviu o mesmo que você também gostou de..."
-```
-  MATCH (me:Usuário {id: 'u0013'})-[:LISTEN]->(m:Musica)<-[:LISTEN]-(other:Usuário)
-  WHERE other <> me
-  WITH me, other, count(m) AS em_comum
-  ORDER BY em_comum DESC LIMIT 20
-  MATCH (other)-[l:LISTEN {liked: true}]->(rec:Musica)
-  WHERE NOT (me)-[:LISTEN]->(rec)
-  RETURN rec.name AS musica,
-  [(a:Artista)-[:COMPOSED]->(rec) | a.name][0] AS artista,
-  count(DISTINCT other) AS usuarios_parecidos,
-  sum(l.quantity) AS reproducoes
-  ORDER BY usuarios_parecidos DESC, reproducoes DESC
-  LIMIT 10
-```
-// Recomendação 2. Por conteúdo: músicas dos gêneros que o usuário curte, que ele não ouviu
-```
-  MATCH (me:Usuário {id: 'u0013'})-[:LIKES_GENRE]->(g:Gênero)<-[:HAS]-(rec:Musica)
-  WHERE NOT (me)-[:LISTEN]->(rec)
-  WITH rec, collect(g.name) AS generos, count(g) AS generos_em_comum
-  RETURN rec.name AS musica,
-  [(a:Artista)-[:COMPOSED]->(rec) | a.name][0] AS artista,
-  generos, generos_em_comum
-  ORDER BY generos_em_comum DESC, musica
-  LIMIT 10
-```
-// Recomendação 3. Artistas seguidos por pessoas conectadas que o usuário ainda não segue
-```
-  MATCH (me:Usuário {id: 'u0013'})-[:CONNECTED]-(amigo:Usuário)-[:FOLLOWS]->(a:Artista)
-  WHERE NOT (me)-[:FOLLOWS]->(a)
-  RETURN a.name AS artista,
-  count(DISTINCT amigo) AS amigos_que_seguem,
-  [(a)-[:BELONG]->(g:Gênero) | g.name] AS generos
-  ORDER BY amigos_que_seguem DESC
-  LIMIT 10
-```
-// Recomendação 4. Artistas parecidos: quem segue este artista também segue...
-```
-  MATCH (:Artista {name: 'Boys Noize'})<-[:FOLLOWS]-(u:Usuário)-[:FOLLOWS]->(outro:Artista)
-  WHERE outro.name <> 'Radiohead'
-  RETURN outro.name AS artista, count(DISTINCT u) AS seguidores_em_comum
-  ORDER BY seguidores_em_comum DESC
-  LIMIT 10
-```
-// Recomendação 5. Para o print em grafo: o "ecossistema" de um usuário
-```
-  MATCH p = (me:Usuário {id: 'u0013'})-[:LISTEN|FOLLOWS|LIKES_GENRE|CONNECTED]->()
-  RETURN p LIMIT 40
-```
-// Recomendação 6. Insight: gêneros mais curtidos por faixa etária (usa age sintetico)
-```
-  MATCH (u:Usuário)-[:LIKES_GENRE]->(g:Gênero)
-  WITH CASE WHEN u.age < 20 THEN '14-19' WHEN u.age < 30 THEN '20-29' ELSE '30+' END AS faixa,
-  g.name AS genero, count(*) AS usuarios
-  ORDER BY faixa, usuarios DESC
-  WITH faixa, collect({genero: genero, usuarios: usuarios})[..3] AS top3
-  RETURN faixa, top3
-```
+// Recomendação 1. 
+
+<img width="1094" height="532" alt="image" src="https://github.com/user-attachments/assets/b691556c-8eba-416d-af5e-ca7b1d545704" />
+
+// Recomendação 2.
+
+<img width="1067" height="591" alt="image" src="https://github.com/user-attachments/assets/9983b835-7ec1-471d-bf61-e5b1fd4c2e3b" />
+
+// Recomendação 3. 
+
+<img width="1251" height="539" alt="image" src="https://github.com/user-attachments/assets/935a03da-1a59-40c5-b1c1-3a80e9d7eed1" />
+
+// Recomendação 4. 
+
+<img width="981" height="545" alt="image" src="https://github.com/user-attachments/assets/0d8b2fd8-39aa-403e-9b7b-c4bd35b844cf" />
+
+// Recomendação 5.
+
+<img width="1255" height="582" alt="image" src="https://github.com/user-attachments/assets/f4ceed89-731e-4346-b329-702b85549ad7" />
+
+// Recomendação 6. 
+
+<img width="1126" height="587" alt="image" src="https://github.com/user-attachments/assets/55448a46-4b92-4596-b8f4-a0ae8b233ee6" />
