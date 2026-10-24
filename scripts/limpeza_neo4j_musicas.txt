@@ -3,7 +3,7 @@
 // (decadas, pais/idioma, humor, instrumento/voz, formato).
 
 // O que será removido 
-MATCH (g:Genre)
+MATCH (g:Gênero)
 WHERE g.name IN ['00s','60s','70s','80s','90s',
                  'american','british','french','german','japanese','polish','russian','swedish',
                  'acoustic','beautiful','chill','chillout','love','mellow','oldies',
@@ -14,7 +14,7 @@ RETURN g.name AS tag, count(r) AS musicas
 ORDER BY musicas DESC
 
 // Remoção
-MATCH (g:Genre)
+MATCH (g:Gênero)
 WHERE g.name IN ['00s','60s','70s','80s','90s',
                  'american','british','french','german','japanese','polish','russian','swedish',
                  'acoustic','beautiful','chill','chillout','love','mellow','oldies',
@@ -23,13 +23,29 @@ WHERE g.name IN ['00s','60s','70s','80s','90s',
 CALL (g) { DETACH DELETE g } IN TRANSACTIONS OF 5 ROWS
 
 // Depois de remover
-MATCH (g:Genre) RETURN count(g) AS generos
+MATCH (g:Gênero) RETURN count(g) AS generos
 MATCH ()-[r:HAS]->() RETURN count(r) AS has
 
 // Quantidade de músicas que ficaram sem nenhum gênero
-MATCH (m:Music) WHERE NOT (m)-[:HAS]->() RETURN count(m) AS musicas_sem_genero
+MATCH (m:Musica) WHERE NOT (m)-[:HAS]->() RETURN count(m) AS musicas_sem_genero
 
 // Deletando as músicas sem gênero
-MATCH (m:Music) WHERE NOT (m)-[:HAS]->() DETACH DELETE m
+MATCH (m:Musica) WHERE NOT (m)-[:HAS]->() DETACH DELETE m
+
+// Deletando os artistas sem músicas
+MATCH (a:Artista) WHERE NOT (a)-[:COMPOSED]->() DETACH DELETE a
+
+// Criação do relacionamento BELONG
+MATCH (a:Artista)-[:COMPOSED]->(m:Musica)
+WITH a, count(m) AS total
+MATCH (a)-[:COMPOSED]->(:Musica)-[:HAS]->(g:Gênero)
+WITH a, total, g, count(*) AS n
+WITH a, total, collect({g: g, n: n}) AS gs
+WITH a, total, gs, reduce(mx = 0, x IN gs | CASE WHEN x.n > mx THEN x.n ELSE mx END) AS maxn
+UNWIND gs AS x
+WITH a, total, maxn, x, 0.2 AS minShare
+WHERE x.n * 1.0 / total >= minShare OR x.n = maxn
+WITH a, x.g AS g
+MERGE (a)-[:BELONG]->(g)
 
 // As imagens relacionadas podem ser vistas no .md dentro da pasta de Imagens/limpeza.md
