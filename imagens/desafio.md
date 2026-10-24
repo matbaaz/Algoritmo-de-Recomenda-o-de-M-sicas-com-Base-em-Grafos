@@ -1,0 +1,65 @@
+# Respostas do desafio de recomendação
+
+## Parâmetros
+
+Para responder ao desafio, podemos utilizar diferentes parâmetros, então decidimos determinar o ID de 1 usuário com 
+`MATCH (u:Usuário) RETURN u.id LIMIT 40`. Tendo a partir dessa query os ID, decido de forma aleatória o u0013 como base para as recomendações.
+
+// Recomendação 1. Filtragem colaborativa: "quem ouviu o mesmo que você também gostou de..."
+```
+  MATCH (me:Usuário {id: 'u0013'})-[:LISTEN]->(m:Musica)<-[:LISTEN]-(other:Usuário)
+  WHERE other <> me
+  WITH me, other, count(m) AS em_comum
+  ORDER BY em_comum DESC LIMIT 20
+  MATCH (other)-[l:LISTEN {liked: true}]->(rec:Musica)
+  WHERE NOT (me)-[:LISTEN]->(rec)
+  RETURN rec.name AS musica,
+  [(a:Artista)-[:COMPOSED]->(rec) | a.name][0] AS artista,
+  count(DISTINCT other) AS usuarios_parecidos,
+  sum(l.quantity) AS reproducoes
+  ORDER BY usuarios_parecidos DESC, reproducoes DESC
+  LIMIT 10
+```
+// Recomendação 2. Por conteúdo: músicas dos gêneros que o usuário curte, que ele não ouviu
+```
+  MATCH (me:Usuário {id: 'u0013'})-[:LIKES_GENRE]->(g:Gênero)<-[:HAS]-(rec:Musica)
+  WHERE NOT (me)-[:LISTEN]->(rec)
+  WITH rec, collect(g.name) AS generos, count(g) AS generos_em_comum
+  RETURN rec.name AS musica,
+  [(a:Artista)-[:COMPOSED]->(rec) | a.name][0] AS artista,
+  generos, generos_em_comum
+  ORDER BY generos_em_comum DESC, musica
+  LIMIT 10
+```
+// Recomendação 3. Artistas seguidos por pessoas conectadas que o usuário ainda não segue
+```
+  MATCH (me:Usuário {id: 'u0013'})-[:CONNECTED]-(amigo:Usuário)-[:FOLLOWS]->(a:Artista)
+  WHERE NOT (me)-[:FOLLOWS]->(a)
+  RETURN a.name AS artista,
+  count(DISTINCT amigo) AS amigos_que_seguem,
+  [(a)-[:BELONG]->(g:Gênero) | g.name] AS generos
+  ORDER BY amigos_que_seguem DESC
+  LIMIT 10
+```
+// Recomendação 4. Artistas parecidos: quem segue este artista também segue...
+```
+  MATCH (:Artista {name: 'Boys Noize'})<-[:FOLLOWS]-(u:Usuário)-[:FOLLOWS]->(outro:Artista)
+  WHERE outro.name <> 'Radiohead'
+  RETURN outro.name AS artista, count(DISTINCT u) AS seguidores_em_comum
+  ORDER BY seguidores_em_comum DESC
+  LIMIT 10
+```
+// Recomendação 5. Para o print em grafo: o "ecossistema" de um usuário
+```
+  MATCH p = (me:Usuário {id: 'u0013'})-[:LISTEN|FOLLOWS|LIKES_GENRE|CONNECTED]->()
+  RETURN p LIMIT 40
+```
+// Recomendação 6. Insight: gêneros mais curtidos por faixa etária (usa age sintetico)
+```
+  MATCH (u:Usuário)-[:LIKES_GENRE]->(g:Gênero)
+  WITH CASE WHEN u.age < 20 THEN '14-19' WHEN u.age < 30 THEN '20-29' ELSE '30+' END AS faixa,
+  g.name AS genero, count(*) AS usuarios
+  ORDER BY faixa, usuarios DESC
+  WITH faixa, collect({genero: genero, usuarios: usuarios})[..3] AS top3
+  RETURN faixa, top3
+```
