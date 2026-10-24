@@ -20,49 +20,56 @@ Link da imagem de modelagem no arrows.app pode ser acessado [aqui](https://arrow
 
 ### Nós
 
--> Pessoa: possuem 2 Labels: `Person` e `User`, sendo as pessoas usuárias do sistema de recomendação de músicas. Possuem as propriedades:
- - Age: Idade em integer
- - Id: identificador único
- - Sex: sexo informado pelo usuário
-
--> Música possuem 1 Label: `Music`, podendo ser classificadas facilmente quando procuramos por músicas de forma unitária. Possuem as propriedades:
- - Length: Tamanho da música em segundos, integer
- - Uploaded_at: Data do upload da música na plataforma
- - Id: identificador único
- - Name: nome da música
-   
--> Artista: possuem 2 Labels: `Person` e `Artist`, sendo então classificados como pessoas artistas (criadoras de música). Possuem as propriedades:
- - Name: Nome do artista/banda
- - Id: Identificador único
- - Age: Idade da banda (desde sua criação) ou do artista solo
-
--> Gênero: possuem 1 Label: `Genre`, sendo a unificação dos gêneros de música. Possuem as propriedades:
- - Id: identificador único
- - Name: Nome do gênero
+|Nome|Labels|Propriedades|
+|---|---|---|
+|Usuário|Person, User|Age, Id, Sex|
+|Música|Musica|Length, Uploaded_at, Id, Name|
+|Artista|Person, Artist|Name, Id, Age|
+|Gênero|Gênero|Id, Name|
 
 !! Note - Os labels de Person foram removidos por tornar os relacionamentos desnecessariamente complexos, pensei em herança (como em orientado a objeto) mas não achei que fez sentido no banco, então removi como dito abaixo.
 
 ### Relacionamentos
 
--> Follow: Uma Pessoa pode seguir um ou mais Artistas
-
--> Like: Uma Pessoa pode gostar de um ou mais Gêneros
-
--> Belong: Um Artista pertence a um ou mais Gêneros de músicas
-
--> Listen: Uma Pessoa pode ouvir uma ou mais Músicas (Propriedades: `Quantity`: número de vezes ouvida, `Liked`: Booleano se gostou da música ou não)
-
--> Has: Uma Música possui um ou mais Gêneros
-
--> Compose: Um Artista pode compor uma ou mais Músicas (Propriedade: `At`: data de composição)
-
--> Connect: Uma Pessoa pode se conectar a uma ou mais Pessoas
+|Relacionamento|Propriedades|
+|---|---|
+|Follows||
+|Likes_genre||
+|Belongs||
+|Listen|Quantity, Liked|
+|Has||
+|Composed|At|
+|Connected||
 
 ---
 
 ## Origem do banco de dados
 
 Para alimentação do Banco de dados foi utilizado o banco originário do kaggle do [last.fm](https://www.kaggle.com/datasets/undefinenull/million-song-dataset-spotify-lastfm) trabalhado para que as músicas pudessem ser adaptadas aos dados planejados na modelagem.
+
+---
+
+## Forma de utilização do Banco
+
+Os arquivos originais baixados do link acima do kaggle devem ser extraídos do .zip em que são providenciados e tratados pelos scripts python dentro de `scripts/`. A ordem de execução deve ser:
+1. `prepare_data.py`
+2. `shrink_listening.py`
+3. `prepare_users.py`
+
+Dessa forma, temos a partir do prepare os valores de `músicas`, `artistas`, `gêneros` e seus relacionamentos `composed` e `has`. O script de `shrink` é necessario pois os dados de usuários e músicas ouvidas é grande demais para ser incluído dentro do Aura Free tier. E após o `prepare` temos os `usuários` junto dos relacionamentos de `likes_genre`, `follows`, `connected` e `listen`. Notem que em nenhum momento os artistas estão conectados aos seus gêneros, isso acontece pois na base de dados os artistas não tinham ligação explicita com os gêneros musicais.
+
+Os arquivos .csv gerados dos scripts foram carregados no Neo4j Aura todos ao mesmo tempo e a ferramenta de IA para inferir os nós e relacionamentos foi utilizada, gerando um bom resultado para as relações esperadas.
+
+A query de geração do relacionamento de `belong` deve ser rodada para gerar esse relacionamento e então termos o design da nossa modelagem completo. Foi utilizado uma forma de que o gênero mais tocado pelo artista é incluído em seus gêneros, juntamente com o parâmetro de mais de 20% das músicas.
+
+Os scripts de limpeza tiveram que ser criados e rodados, como podemos ver abaixo em toubleshooting.
+
+---
+
+## Respostas adquiridas deste desafio
+
+//TODO, vou dormi
+
 
 ---
 
@@ -75,3 +82,5 @@ Para alimentação do Banco de dados foi utilizado o banco originário do kaggle
 - Houveram 3 artistas com idades não esperadas (1 com null e 2 com acima de 80 anos). Fiz o set manual deles com a idade em seu momento de falecimento (Betty Wright, Billie Holiday e Lucille Bogan).
 
 - Parte das músicas não apresentava gênero dentro do banco de dados, foi utilizada então o campo de tag para selecionar como gênero (dando mais de 1 gênero para as músicas). Tags que não são consideradas gênero foram apagadas utilizando o DETACH DELETE para remoção de seus nós e relacionamentos.
+
+- Para mais ouvidos por faixa etaria (Recomendação 6) pela forma que o banco foi gerado, houve diferença no 6o para frente dos gêneros. Dessa forma mantive em 3 somente para visualização simplificada. Como as idades foram geradas de forma aleatoria no script python, esse dado ficou desconexo da realidade dentro desta base.
