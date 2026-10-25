@@ -2,6 +2,16 @@
 
 Este repositório é a base para o desafio de Criação de Algoritmo de Recomendação de Músicas com Base em Grafos da DIO baseado em `neo4J`.
 
+## Por que utilizar um banco de dados baseado em grafos para a modelagem de um sistema de recomendação de músicas?
+
+Os bancos de dados baseados em grafos possuem uma característica que os BDs relacionais (SQL) não possuem: podem realizar relacionamentos entre nós (entidades) de forma mais simples. Os relacionamentos são guardados diretamente entre os nós, sem precisar comparar chaves.
+
+Isso significa que podemos realizar queries de pesquisa com linguagem mais simples e com maior eficiência, desde que essa query de pesquisa requeira diversos pulos entre varias "tabelas".
+A quantidade de joins necessarias para percorrer um banco SQL inteiro depende das restrições e relacionamento entre as tabelas, já no Neo4J precisamos somente mostrar o caminho de nós e relacionamentos para podermos percorer grandes caminhos. Com essa facilidade podemos calcular mais intuitivamente:
+ - Vizinhança: nós perto e parecidos
+ - Recomendação: usuário -> item -> outro usuário -> item recomendado
+ - Menor caminho: como no linkedin que mostra as conecções - 1, 2, 3 ou mais de distância
+   
 Para este projeto, foi planejado utilizar a seguinte modelagem do banco de dados baseados em grafos:
 
 <img width="1000" height="927" alt="Untitled graph" src="https://github.com/user-attachments/assets/0822f79f-99cb-4a4c-9185-8c5e1ce723a0" />
