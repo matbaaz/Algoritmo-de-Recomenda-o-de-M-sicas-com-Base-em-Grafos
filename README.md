@@ -1,16 +1,16 @@
-# Algoritmo-de-Recomendaçao-de-Musicas-com-Base-em-Grafos
+# Algoritmo-de-Recomendação-de-Músicas-com-Base-em-Grafos
 
-Este repositório é a base para o desafio de Criação de Algoritmo de Recomendação de Músicas com Base em Grafos da DIO baseado em `neo4J`.
+Este repositório é a base para o desafio de Criação de Algoritmo de Recomendação de Músicas com Base em Grafos da DIO baseado em `Neo4J`.
 
 ## Por que utilizar um banco de dados baseado em grafos para a modelagem de um sistema de recomendação de músicas?
 
 Os bancos de dados baseados em grafos possuem uma característica que os BDs relacionais (SQL) não possuem: podem realizar relacionamentos entre nós (entidades) de forma mais simples. Os relacionamentos são guardados diretamente entre os nós, sem precisar comparar chaves.
 
-Isso significa que podemos realizar queries de pesquisa com linguagem mais simples e com maior eficiência, desde que essa query de pesquisa requeira diversos pulos entre varias "tabelas".
-A quantidade de joins necessarias para percorrer um banco SQL inteiro depende das restrições e relacionamento entre as tabelas, já no Neo4J precisamos somente mostrar o caminho de nós e relacionamentos para podermos percorer grandes caminhos. Com essa facilidade podemos calcular mais intuitivamente:
+Isso significa que podemos realizar queries de pesquisa com linguagem mais simples e com maior eficiência, desde que essa query de pesquisa requeira diversos pulos entre várias "tabelas".
+A quantidade de joins necessários para percorrer um banco SQL inteiro depende das restrições e relacionamento entre as tabelas, já no Neo4J precisamos somente mostrar o caminho de nós e relacionamentos para podermos percorrer grandes caminhos. Com essa facilidade podemos calcular mais intuitivamente:
  - Vizinhança: nós perto e parecidos
  - Recomendação: usuário -> item -> outro usuário -> item recomendado
- - Menor caminho: como no linkedin que mostra as conecções - 1, 2, 3 ou mais de distância
+ - Menor caminho: como no linkedin que mostra as conexões - 1, 2, 3 ou mais de distância
    
 Para este projeto, foi planejado utilizar a seguinte modelagem do banco de dados baseados em grafos:
 
@@ -61,12 +61,12 @@ Para alimentação do Banco de dados foi utilizado o banco originário do kaggle
 
 ## Forma de utilização do Banco
 
-Os arquivos originais baixados do link acima do kaggle devem ser extraídos do .zip em que são providenciados e tratados pelos scripts python dentro de `scripts/`. A ordem de execução deve ser:
+Os arquivos originais baixados do link acima do kaggle devem ser extraídos do .zip em que são fornecidos e tratados pelos scripts python dentro de `scripts/`. A ordem de execução deve ser:
 1. `prepare_data.py`
 2. `shrink_listening.py`
 3. `prepare_users.py`
 
-Dessa forma, temos a partir do prepare os valores de `músicas`, `artistas`, `gêneros` e seus relacionamentos `composed` e `has`. O script de `shrink` é necessario pois os dados de usuários e músicas ouvidas é grande demais para ser incluído dentro do Aura Free tier. E após o `prepare` temos os `usuários` junto dos relacionamentos de `likes_genre`, `follows`, `connected` e `listen`. Notem que em nenhum momento os artistas estão conectados aos seus gêneros, isso acontece pois na base de dados os artistas não tinham ligação explicita com os gêneros musicais.
+Dessa forma, temos a partir do prepare os valores de `músicas`, `artistas`, `gêneros` e seus relacionamentos `composed` e `has`. O script de `shrink` é necessário pois os dados de usuários e músicas ouvidas é grande demais para ser incluído dentro do Aura Free tier. E após o `prepare` temos os `usuários` junto dos relacionamentos de `likes_genre`, `follows`, `connected` e `listen`. Notem que em nenhum momento os artistas estão conectados aos seus gêneros, isso acontece pois na base de dados os artistas não tinham ligação explicita com os gêneros musicais.
 
 Os arquivos .csv gerados dos scripts foram carregados no Neo4j Aura todos ao mesmo tempo e a ferramenta de IA para inferir os nós e relacionamentos foi utilizada, gerando um bom resultado para as relações esperadas.
 
@@ -78,8 +78,25 @@ Os scripts de limpeza tiveram que ser criados e rodados, como podemos ver abaixo
 
 ## Respostas adquiridas deste desafio
 
-//TODO, vou dormi
+Para mostrar todo o poder do Neo4J algumas queries foram criadas (scripts/desafio.txt) e seus resultados apresentados das queries nas imagens (imagens/desafio.md). As análises das respostas encontradas se darão aqui abaixo:
 
+### Query 1: Quem ouviu o mesmo que você curtiu?
+ A ideia aqui é encontrar primeiramente pessoas com os mesmos gostos musicais e tenham ouvido as mesmas músicas que o usuário. A partir daí são encontradas músicas que este outro usuário tenha ouvido mas o primeiro não e essas músicas então são recomendadas.
+
+### Query 2: Gêneros que o usuário curte.
+A ideia é recomendar a partir dos gêneros que o usuário já curte. Se não ouviu alguma música desse gênero, ela então é recomendada.
+
+### Query 3: Quais artistas as pessoas que eu me conectei seguem?
+A ideia é mostrar quais são os artistas que as pessoas que o usuário se conectou segue, que o próprio usuário não segue.
+
+### Query 4: Quem segue este artista seguem quem também?
+Desejamos mostrar os outros artistas seguidos por pessoas que seguem um artista, dessa forma é uma pesquisa não direcionada no usuário e sim no artista.
+
+### Query 5: Quem é o usuário?
+Mostra de forma visual conexões, likes, músicas ouvidas e tudo mais sobre um usuário. Limitei em 40 para visualização. Conseguimos traçar perfil e ecossistema utilizando essa query.
+
+### Query 6: Gêneros mais curtidos por faixa etária.
+A sexta query idealizada mostra uma separação por faixa etária. Poderemos entender melhor o problema encontrado em troubleshooting.
 
 ---
 
@@ -93,4 +110,4 @@ Os scripts de limpeza tiveram que ser criados e rodados, como podemos ver abaixo
 
 - Parte das músicas não apresentava gênero dentro do banco de dados, foi utilizada então o campo de tag para selecionar como gênero (dando mais de 1 gênero para as músicas). Tags que não são consideradas gênero foram apagadas utilizando o DETACH DELETE para remoção de seus nós e relacionamentos.
 
-- Para mais ouvidos por faixa etaria (Recomendação 6) pela forma que o banco foi gerado, houve diferença no 6o para frente dos gêneros. Dessa forma mantive em 3 somente para visualização simplificada. Como as idades foram geradas de forma aleatoria no script python, esse dado ficou desconexo da realidade dentro desta base.
+- Para mais ouvidos por faixa etária (Recomendação 6) pela forma que o banco foi gerado, houve diferença no 6º para frente dos gêneros. Dessa forma mantive em 3 somente para visualização simplificada. Como as idades foram geradas de forma aleatória no script python, esse dado ficou desconexo da realidade dentro desta base. Lembrando que o banco original não possuia idades dos usuários, por isso foram criados de forma aleatória em script.
